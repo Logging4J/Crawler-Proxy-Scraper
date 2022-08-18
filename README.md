@@ -8,6 +8,6 @@ A simple proxy scraper written in python
 
 1. go into cmd
 2. type 'pip install colorama'
-3 type 'python crawler.py' to run the program
+3. type 'python crawler.py' to run the program
 
 Happy Scraping ^_^
