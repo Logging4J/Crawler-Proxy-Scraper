@@ -17,55 +17,63 @@ print(Fore.GREEN + '''
  ::: :::  ::   :::  ::   :::   :::: :: :::    :: ::::   :: ::::  ::   :::  
  :: :: :   :   : :   :   : :    :: :  : :    : :: : :  : :: ::    :   : :                         
 ''')
+
+bad = []
+good = []
+
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 
-print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'What type of proxy do you want(HTTP, SOCKS4, SOCKS5): ')
-tp = input()
+def toString(arr):
+    s = ''
+    for i in range(len(arr)):
+        if i > 0:
+            if i == len(arr) - 1:
+                s = s + ' and '
+            else:
+                s = s + ', '
+        s = s + arr[i];
+    return s
+
+
 print('\n')
 
-if(tp == 'HTTP'):
-    url = 'https://api.openproxylist.xyz/http.txt'
-    r = requests.get(url)
-    results = r.text
-    with open ('http.txt', 'w') as file:
-        file.write(results)
-        print(results)
+url = 'https://raw.githubusercontent.com/yemixzy/proxy-list/main/proxy-list/data.txt'
+r = requests.get(url)
+results = r.text
+with open ('proxies.txt', 'w') as file:
+    file.write(results)
+    print(results)
 
-    with open('http.txt', 'r') as fp:
-        for count, line in enumerate(fp):
-            pass
+with open('proxies.txt', 'r') as fp:
+    for count, line in enumerate(fp):
+        pass
 
-    print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'HTTP proxies Printed: [{count+ 1}]')
+print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'Proxies Printed: [{count+ 1}]')
 
-if(tp == 'SOCKS4'):
-    url = 'https://api.openproxylist.xyz/socks4.txt'
-    r = requests.get(url)
-    results = r.text
-    with open ('socks4.txt', 'w') as file:
-        file.write(results)
-        print(results)
+checked_proxy_file = open("checked.txt", "w")
+proxy_file = open('proxies.txt', 'r')
+proxies = proxy_file.read()
+proxies = proxies.splitlines()
 
-    with open('socks4.txt', 'r') as fp:
-        for count, line in enumerate(fp):
-            pass
-
-    print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'SOCKS4 proxies Printed: [{count+ 1}]')
-
-
-if(tp == 'SOCKS5'):
-    url = 'https://api.openproxylist.xyz/socks5.txt'
-    r = requests.get(url)
-    results = r.text
-    with open ('socks5.txt', 'w') as file:
-        file.write(results)
-        print(results)
-
-    with open('socks5.txt', 'r') as fp:
-        for count, line in enumerate(fp):
-            pass
-
-    print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'SOCKS5 proxies Printed: [{count+ 1}]')
+for proxy in proxies:
+    try:
+        print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f"Checking: " + proxy) 
+        resp = (requests.get("http://google.com", proxies={"http":"http://" + proxy, "https": "https://" + proxy}, timeout=2)) 
+        good.append(proxy)
+        checked_proxy_file.write(toString(good))
+    except requests.exceptions.ProxyError:
+        bad.append(proxy)
+        print(Fore.WHITE + f'[{current_time}]' + Fore.RED + f'Bad Proxy: ProxyError')
+        pass
+    except requests.exceptions.ConnectionError:
+        bad.append(proxy)
+        print(Fore.WHITE + f'[{current_time}]' + Fore.RED + f'Bad Proxy: ConnectionError')
+        pass
+    except requests.exceptions.Timeout:
+        bad.append(proxy)
+        print(Fore.WHITE + f'[{current_time}]' + Fore.RED + f'Bad Proxy: Timeout')
+        pass
 
 print(Fore.WHITE + f'[{current_time}]' + Fore.GREEN + f'Press Enter to close the program')
 input()
